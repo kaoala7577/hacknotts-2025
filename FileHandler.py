@@ -4,6 +4,7 @@ from LOGGER import *
 FILE_READ = 0
 FILE_WRITE = 1
 FILE_WRITE_BYTES = 2
+FILE_READ_BYTES = 3
 #Handle created by the file handler
 
 class FileHandle():
@@ -17,12 +18,15 @@ class FileHandle():
         if mode == 0:
             self.file = open(mFileName, "r")
             self.status = "READ"
-        if mode == 1:
+        elif mode == 1:
             self.file = open(mFileName, "w")
             self.status = "WRITE"
-        if mode == 2:
-            self.file = open(mDileName, "wb")
+        elif mode == 2:
+            self.file = open(mFileName, "wb")
             self.status = "WRITE"
+        elif mode == 3:
+            self.file = open(mFileName, "rb")
+            self.status = "READ"
 
     def closeFile(self):
         if self.status != "CLOSED":
