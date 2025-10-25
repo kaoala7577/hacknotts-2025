@@ -85,8 +85,6 @@ class Player():
         self.setSeed(int(bitJoin32(hexData[:4]), base=16))
         hexData = hexData[4:]
 
-        print(hexData)
-        
     def expToFile(self, mFileName):
         handle = self.fileHandler.openFile(mFileName, FILE_WRITE_BYTES)
         hexArray = ["72", "79", "20", "25"]
