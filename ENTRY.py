@@ -4,9 +4,16 @@ from Player import *
 import random
 from Misc import *
 
-import playsound
 import time
 import threading
+import multiprocessing
+import winsound
+
+winsound.PlaySound("TD.wav", winsound.SND_FILENAME)
+
+#if __name__ == "__main__":
+#    musicThread = multiprocessing.Process(target=playsound.playsound, args=("C:\\Users\\galax\\Downloads\\TPOC.mp3"))
+#    musicThread.start()
 
 
 print("\n"*100 +
