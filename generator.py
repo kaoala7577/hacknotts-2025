@@ -30,10 +30,9 @@ class Path:
 
 
 class Encounter:
-    def __init__(self):
-        # temp encounter list, take from encounters module later
+    def __init__(self, encounter=None):
         encounters = Allies.__subclasses__() + Enemy.__subclasses__()
-        self.encounter = random.choice(encounters)
+        self.encounter = encounter if encounter and encounter in encounters else random.choice(encounters)
         # further details can be added here later
 
 
@@ -107,6 +106,23 @@ class Map:
             visible_map.append(visible_row)
         
         return visible_map
+
+    def get_valid_coords(self):
+        valid_coords = []
+        for row in range(self.size):
+            for col in range(self.size):
+                cell = self.map_grid[row][col]
+                if cell:
+                    valid_coords.append((row, col))
+        return valid_coords
+    
+    def change_encounter(self, row, col, new_encounter):
+        if (row, col) not in self.get_valid_coords():
+            raise ValueError("Invalid cell coordinates.")
+        
+        cell = self.map_grid[row][col]
+        if cell:
+            cell.encounter = Encounter(encounter=new_encounter)
 
     def display_map(self, visible_only=True):
         map = self.get_visible_map() if visible_only else self.map_grid
