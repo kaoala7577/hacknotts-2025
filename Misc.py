@@ -1,5 +1,13 @@
 ##MISC FUNCTIONS
+import time
 
+def clearScreen():
+    print("\n"*100)
+
+def scrollText(text):
+    for x in text:
+        print(x, end="")
+        time.sleep(0.30)
 
 def pad0s(string, modulo):
     while len(string) % modulo != 0:
