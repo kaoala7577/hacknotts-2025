@@ -16,7 +16,7 @@ class MusicPlayer():
         self.forceSilent = False
         self.stop = False
         self.circular = 0
-        self.QUIT = True
+        self.QUIT = True      
 
     def sleeper(self):
         time.sleep(self.DURATION[self.circular])
