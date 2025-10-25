@@ -1,6 +1,6 @@
 from random import randint
 
-class Inventory:
+class inventory:
     def __init__(self):
         self.rarity = ["common","uncommon","rare","epic","legendary"]
         self.items = {}
