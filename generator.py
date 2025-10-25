@@ -1,4 +1,6 @@
 import random
+from allies import Allies
+from enemies import Enemy
 
 # GLOBALS
 ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
@@ -10,9 +12,12 @@ random.seed(seed)
 
 
 class Path:
-    def __init__(self, edge=0, start=False):
+    def __init__(self, edge=0, start=False, end=False):
         path_types = ['Dead End', 'Straight', 'Positive Corner', 'Negative Corner', 'Fork', 'Crossroads']
         self.type = random.choice(path_types)
+
+        if end:
+            self.type = 'Dead End'
 
         while start and self.type not in ['Fork', 'Crossroads']:
             self.type = random.choice(path_types)
@@ -25,16 +30,15 @@ class Path:
 
 
 class Encounter:
-    def __init__(self):
-        # temp encounter list, take from encounters module later
-        encounters = ['Bandits', 'Wild Animals', 'Traders', 'Travelers', 'Monsters']
-        self.encounter = random.choice(encounters)
+    def __init__(self, encounter=None):
+        encounters = Allies.__subclasses__() + Enemy.__subclasses__()
+        self.encounter = encounter if encounter and encounter in encounters else random.choice(encounters)
         # further details can be added here later
 
 
 class Cell:
-    def __init__(self, visible=False, edge=0, start=False):
-        self.path = Path(edge=edge, start=start)
+    def __init__(self, visible=False, edge=0, start=False, end=False):
+        self.path = Path(edge=edge, start=start, end=end)
         self.encounter = Encounter() if random.randint(1, 100) <= ENCOUNTER_CHANCE else None
         self.visited = start
         self.visible = visible or start
@@ -51,14 +55,17 @@ class Map:
         self.map_grid.insert(0,first_row)
 
         for row in range(1, self.size):
-            for col in range(self.size):    
-                pointer_cells = self.get_pointer_cells(row, col)
-                if pointer_cells:
-                    edge = 1 if col == self.size - 1 else -1 if col == 0 else 0
-                    visible = any(self.map_grid[pc[0]][pc[1]].visited for pc in pointer_cells)
-                    new_cell = Cell(visible=visible, edge=edge)
-                    self.map_grid[row][col] = new_cell
-
+            temp_row = [None for _ in range(self.size)]
+            end = row == self.size - 1
+            while all(cell is None or (cell.path.type == 'Dead End' and not end) for cell in temp_row):
+                for col in range(self.size):
+                    pointer_cells = self.get_pointer_cells(row, col)
+                    if pointer_cells:
+                        edge = 1 if col == self.size - 1 else -1 if col == 0 else 0
+                        visible = any(self.map_grid[pc[0]][pc[1]].visited for pc in pointer_cells)
+                        new_cell = Cell(visible=visible, edge=edge, end=end)
+                        temp_row[col] = new_cell
+            self.map_grid[row] = temp_row
 
     def get_pointer_cells(self, row_index, col_index):
         pointer_cells = []
@@ -81,8 +88,6 @@ class Map:
         return pointer_cells
 
     def row_has_visible_cells(self, row_index):
-        print(f"regular: {self.map_grid[row_index]}")
-        print(f"minus 1: {self.map_grid[row_index-1]}")
         return any(cell and cell.visible for cell in self.map_grid[row_index-1])
     
     def get_visible_map(self):
@@ -101,6 +106,23 @@ class Map:
             visible_map.append(visible_row)
         
         return visible_map
+
+    def get_valid_coords(self):
+        valid_coords = []
+        for row in range(self.size):
+            for col in range(self.size):
+                cell = self.map_grid[row][col]
+                if cell:
+                    valid_coords.append((row, col))
+        return valid_coords
+    
+    def change_encounter(self, row, col, new_encounter):
+        if (row, col) not in self.get_valid_coords():
+            raise ValueError("Invalid cell coordinates.")
+        
+        cell = self.map_grid[row][col]
+        if cell:
+            cell.encounter = Encounter(encounter=new_encounter)
 
     def display_map(self, visible_only=True):
         map = self.get_visible_map() if visible_only else self.map_grid
@@ -123,16 +145,8 @@ class Map:
                         elif cell.path.type == 'Crossroads':
                             print("+", end="")
 
-                        if encounter == 'Bandits':
-                            print("[B]", end=" ")
-                        elif encounter == 'Wild Animals':
-                            print("[W]", end=" ")
-                        elif encounter == 'Traders':
-                            print("[T]", end=" ")
-                        elif encounter == 'Travelers':
-                            print("[R]", end=" ")
-                        elif encounter == 'Monsters':
-                            print("[M]", end=" ")
+                        if encounter:
+                            print(f"[{encounter.__name__.upper()}]", end=" ")
                         else:
                             print("[N]", end=" ")
                     elif visible_only and cell.visible: 
@@ -144,5 +158,4 @@ class Map:
 
 if __name__ == "__main__":
     game_map = Map(size=10)
-    game_map.display_map()
     game_map.display_map(False)
