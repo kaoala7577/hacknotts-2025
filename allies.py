@@ -1,11 +1,13 @@
 from Player import *
 from random import randint
 from inventory import *
+from generator import *
+import inventory
 
 class Allies:
     def __init__(self, allyType = None):
         self.allyType = allyType
-        self.Inventory = Inventory()
+        self.Inventory = inventory()
 
 
 class Healer(Allies):
@@ -75,17 +77,38 @@ class Knight(Allies):
         self.addItem(self.givenWeapon)
         self.addItem(self.givenArmour)
 
-        
-'''class Seer(Allies):
+class Tavern(Allies):
     def __init__(self):
-        super().__init__("Seer")
-        self.prediction_chance = randint(1,100)
-        self.choices = ["hear prediction","decline"]
-        if self.choices == "hear prediction":
-            if self.prediction_chance > 50:
-
-                print("The Seer predicts that you will succeed on your quest and find great fortune!")
-            else:
-                print("The Seer foresees challenges ahead, but with courage, you may overcome them.")
-        elif self.choices == "decline":
-            print("You have declined to hear the Seer's prediction.")'''
+        super().__init__("Tavern")
+        self.location = ["Village","Town","City","Fortress","Castle"]
+        self.TavernLocation = self.location[randint(0,len(self.location)-1)]
+        if self.TavernLocation == "village":
+            print("You have arrived at a small village tavern.You rest amongst the friendly villagers, but realise you need to keep moving on your quest regardless of the warm welcome. After a brief respite, you continue your journey, feeling slightly more refreshed. Your health increases by 10 points.")
+            self.pHealth = self.getHealth()
+            self.pHealth += 10
+            self.setHealth(self.pHealth)
+            print(f"Your health is now {self.pHealth}.")
+        elif self.TavernLocation == "town":
+            print("You have stumbled upon a bustling town tavern filled with cheerful town folk and excited adventurers. You decide to settle here briefly, enjoying the lively atmosphere. After a hearty meal and some rest, you feel rejuvenated, and your health increases by 15 points.")
+            self.pHealth = self.getHealth()
+            self.pHealth += 15
+            self.setHealth(self.pHealth)
+            print(f"Your health is now {self.pHealth}.")
+        elif self.TavernLocation == "city":
+            print("You enter a grand city tavern, where the air is filled with the sounds of music and laughter. You take a moment to relax and mingle with the vivacious city dwellers. After a night filled with merriment (and potential hangover), you gather your strength and your health increases by 20 points.")
+            self.pHealth = self.getHealth()
+            self.pHealth += 20
+            self.setHealth(self.pHealth)
+            print(f"Your health is now {self.pHealth}.")
+        elif self.TavernLocation == "fortress":
+            print("You find yourself in a fortified tavern within a mighty fortress. The atmosphere is filled with tales of valor and bravery. You take a moment to rest among the seasoned warriors, gaining inspiration from their stories. After some time, you feel invigorated, and your health increases by 25 points.")
+            self.pHealth = self.getHealth()
+            self.pHealth += 25
+            self.setHealth(self.pHealth)
+            print(f"Your health is now {self.pHealth}.")
+        elif self.TavernLocation == "castle":
+            print("You are granted the rare privilege of entering a lavish castle tavern only frequented by royalty, nobles and distinguished guests. The opulence and grandeur of the surroundings initially overwhelm you, but you soon find yourself relaxing and getting used to the taste of luxury. Alas after a night of indulgence and extravagance, you must continue your quest though you will miss the comforts of the castle. Your health increases by 30 points.")
+            self.pHealth = self.getHealth()
+            self.pHealth += 30
+            self.setHealth(self.pHealth)
+            print(f"Your health is now {self.pHealth}.")
