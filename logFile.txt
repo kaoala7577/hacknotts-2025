@@ -1,0 +1,6 @@
+
+Start of new session.
+----------------
+[INFO]: This is a log test!
+----------------
+End of current session.
