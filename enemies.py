@@ -97,8 +97,8 @@ class Enemy:
 
 
 class Wolves(Enemy):
-    super().__init__("Wolves")
     def __init__(self):
+        super().__init__("Wolves")
         self.number = randint(1,10)
         self.choices = ["attack","run away"]
         if self.choices == "attack":
@@ -117,8 +117,8 @@ class Wolves(Enemy):
 
    
 class Dragon (Enemy):
-    super().__init__("Dragon")
     def __init__(self):
+        super().__init__("Dragon")
         self.Dhealth = 100
         self.choices = ["attack","run away"]
         if self.choices == "attack":
@@ -139,8 +139,8 @@ class Dragon (Enemy):
         
 
 class Barbarians (Enemy):
-    super().__init__("Barbarians")
     def __init__(self):
+        super().__init__("Barbarians")
         self.strength = randint(50,100)
         self.trade_amount = randint(10,75)
         self.choices = ["attack","trade"]
@@ -157,8 +157,8 @@ class Barbarians (Enemy):
        
     
 class Bandits(Enemy):
-    super().__init__("Bandits")
     def __init__(self):
+        super().__init__("Dragon")
         self.steal_amount = randint(5,25)
         self.trade_amount = randint(1,50)
         self.choices = ["attack","trade","run away"]
@@ -171,3 +171,43 @@ class Bandits(Enemy):
         elif self.choices == "run away":
             result = self.runAway("Bandits")
             return result
+        
+    def banditsSteal(self, prefer_highest=True):
+        removed = []
+
+        if not self.items:
+            return removed
+
+        # find highest rarity index present
+        present_indices = {self.rarity.index(meta["rarity"]) for meta in self.items.values()}
+        max_idx = max(present_indices)
+        min_idx = min(present_indices)
+
+        # try take one highest if requested and available
+        if prefer_highest and max_idx is not None:
+            candidates = self._items_of_rarity_index(max_idx)
+            if candidates:
+                # pick one candidate (choose the first)
+                name, meta = candidates[0]
+                removed_item = self.removeItem(name)
+                if removed_item:
+                    removed.append(removed_item)
+                    return removed
+
+    
+        to_remove = 2
+        idx = min_idx
+        while to_remove > 0 and idx <= max_idx:
+            candidates = self._items_of_rarity_index(idx)
+            for name, meta in list(candidates):
+                if to_remove <= 0:
+                    break
+                # remove one instance
+                item_removed = self.removeItem(name)
+                if item_removed:
+                    removed.append(item_removed)
+                    to_remove -= 1
+            idx += 1
+
+        return removed
+    
