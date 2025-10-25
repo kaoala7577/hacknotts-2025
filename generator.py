@@ -1,4 +1,6 @@
 import random
+from allies import Allies
+from enemies import Enemy
 
 # GLOBALS
 ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
@@ -30,7 +32,7 @@ class Path:
 class Encounter:
     def __init__(self):
         # temp encounter list, take from encounters module later
-        encounters = ['Bandits', 'Wild Animals', 'Traders', 'Travelers', 'Monsters']
+        encounters = Allies.__subclasses__() + Enemy.__subclasses__()
         self.encounter = random.choice(encounters)
         # further details can be added here later
 
@@ -127,16 +129,8 @@ class Map:
                         elif cell.path.type == 'Crossroads':
                             print("+", end="")
 
-                        if encounter == 'Bandits':
-                            print("[B]", end=" ")
-                        elif encounter == 'Wild Animals':
-                            print("[W]", end=" ")
-                        elif encounter == 'Traders':
-                            print("[T]", end=" ")
-                        elif encounter == 'Travelers':
-                            print("[R]", end=" ")
-                        elif encounter == 'Monsters':
-                            print("[M]", end=" ")
+                        if encounter:
+                            print(f"[{encounter.__name__.upper()}]", end=" ")
                         else:
                             print("[N]", end=" ")
                     elif visible_only and cell.visible: 
