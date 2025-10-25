@@ -3,7 +3,7 @@ from LOGGER import *
 
 FILE_READ = 0
 FILE_WRITE = 1
-
+FILE_WRITE_BYTES = 2
 #Handle created by the file handler
 
 class FileHandle():
@@ -19,6 +19,9 @@ class FileHandle():
             self.status = "READ"
         if mode == 1:
             self.file = open(mFileName, "w")
+            self.status = "WRITE"
+        if mode == 2:
+            self.file = open(mDileName, "wb")
             self.status = "WRITE"
 
     def closeFile(self):
