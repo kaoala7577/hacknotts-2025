@@ -2,20 +2,26 @@
 from FileHandler import *
 from LOGGER import *
 from Misc import *
+from inventory import *
 
 class Player():
-    def __init__(self, health, gold, name, fileHandler, logger):
-        self.logger = logger
-        self.gold = gold
-        self.health = health
-        self.name = name
-        self.fileHandler = fileHandler
-        self.locX = 0
-        self.locY = 0
+    
+    def gainItem(self, item, itemRarity=None):
+        self.inventory.addItem(item, itemRarity)
+
+    def loseItem(self, item):
+        self.inventory.removeItem(item, itemRarity)
 
     def __init__(self, fileHandler, logger):
         self.fileHandler = fileHandler
         self.logger = logger
+        self.gold = 0
+        self.health = 10
+        self.name = ""
+        self.locX = 0
+        self.locY = 0
+
+        self.inventory = Inventory()
 
     def __repr__(self):
         return self.name
@@ -56,6 +62,8 @@ class Player():
     def getSeed(self):
         return self.seed
 
+
+    ##Data generating stuff
 
     def genFromFile(self, mFileName):
         handle = self.fileHandler.openFile(mFileName, FILE_READ_BYTES)
@@ -103,17 +111,19 @@ class Player():
         self.fileHandler.writeData(handle, bytearray(hexArray))
         self.fileHandler.closeFile(handle)
 
+    def printPlayerInfo(self):
+        formString = self.name.upper() + "\n\n================\n\n"
+        formString += "HEALTH: " + str(self.getHealth())+"\n"
+        formString += "GOLD: " + str(self.getGold())+"\n\n================\n\nINVENTORY\n\n"
+        formString += self.inventory.viewInventory()
+
+        print(formString)
+        
+
+
 if __name__ == "__main__":
     dummyLogger = LOGGER()
     dummyFileHandler = FileHandler(dummyLogger)
     stevie = Player(dummyFileHandler, dummyLogger)
-    stevie.setLocationX(324567)
-    stevie.setLocationY(98765)
-    stevie.setHealth(10)
-    stevie.setSeed(21435120)
-    stevie.setGold(10)
     stevie.setName("Stevie Wonder")
-    stevie.expToFile("Stevie.txt")
-
-    stevieCopy = Player(dummyFileHandler, dummyLogger)
-    stevieCopy.genFromFile("Stevie.txt")
+    stevie.printPlayerInfo()
