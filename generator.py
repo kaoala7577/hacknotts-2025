@@ -6,8 +6,6 @@ ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
 # SEEDING
 #seed = random.randint(0, 1000000)
 seed = 5000 # fixed value for testing
-random.seed(seed)
-
 
 class Path:
     def __init__(self, edge=0, start=False):
@@ -41,7 +39,10 @@ class Cell:
 
 
 class Map:
-    def __init__(self, size=5):
+    def __init__(self, size=5, seed=None):
+        if seed == None:
+            seed = 5000
+        self.seed = seed
         self.size = size
         self.map_grid = [[None for _ in range(size)] for _ in range(size-1)]
 
