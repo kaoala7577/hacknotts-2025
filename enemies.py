@@ -1,6 +1,7 @@
 from Player import *
 from random import randint
 from inventory import *
+import inventory
 
 #enemy class that stores all the enemies in the game
 class Enemy:
@@ -13,7 +14,7 @@ class Enemy:
         self.pMoney = Player.getGold(self)
         if self.enemy_type == "Bandits":
             if self.trade_amount > self.pMoney:
-                self.Inventory.banditsSteal(Inventory,self,prefer_highest=True)
+                self.Inventory.banditsSteal(inventory,self,prefer_highest=True)
                 return "The bandits are displeased with your offer and steal from you."
             else:
                 self.newGold = self.addGold(-self.trade_amount)
@@ -143,7 +144,7 @@ class Barbarians (Enemy):
         super().__init__("Barbarians")
         self.strength = randint(50,100)
         self.trade_amount = randint(10,75)
-        self.choices = ["attack","trade"]
+        self.choices = ["attack","trade","run away"]
         if self.choices == "trade":
             result = self.trade("Barbarians")
             return result
