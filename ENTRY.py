@@ -3,13 +3,15 @@ from generator import Map
 from Player import *
 import random
 from Misc import *
+from MusicEngine import *
+
 
 import time
 import threading
 import multiprocessing
 import winsound
 
-winsound.PlaySound("TD.wav", winsound.SND_FILENAME)
+#winsound.PlaySound("TDance.wav", winsound.SND_ASYNC | winsound.SND_FILENAME)
 
 #if __name__ == "__main__":
 #    musicThread = multiprocessing.Process(target=playsound.playsound, args=("C:\\Users\\galax\\Downloads\\TPOC.mp3"))
