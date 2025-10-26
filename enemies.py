@@ -14,7 +14,7 @@ class Enemy:
         self.pMoney = Player.getGold(self)
         if self.enemy_type == "Bandits":
             if self.trade_amount > self.pMoney:
-                self.Inventory.banditsSteal(inventory,self,prefer_highest=True)
+                self.inventory.banditsSteal(inventory,self,prefer_highest=True)
                 return "The bandits are displeased with your offer and steal from you."
             else:
                 self.newGold = self.addGold(-self.trade_amount)
@@ -29,11 +29,13 @@ class Enemy:
         self.pHealth = Player.getHealth(self)
         if self.enemy_type == "Bandits":
             if self.strength > 75:
-                return "The bandits have overpowered you and killed you."
+                self.inventory.banditsSteal(inventory,self,prefer_highest=True)
+                return "The bandits have overpowered you and stolen from you."
             else:
                 if self.pHealth < 75 and self.strength < 75:
                     return "You have defeated the bandits!"
                 elif self.pHealth < self.strength:
+                    self.inventory.banditsSteal(inventory,self,prefer_highest=True)
                     return "The bandits have defeated you and stolen from you."
                 elif self.pHealth > self.strength:
                     return "The bandits have been defeated! Proceed on your quest young adventurer."
@@ -71,6 +73,7 @@ class Enemy:
             if chance > 50:
                 return "You have successfully run away from the Bandits!"
             else:
+                self.inventory.banditsSteal(inventory,self,prefer_highest=True)
                 return "The Bandits have caught you and stolen from you."
         elif self.enemy_type == "Barbarians":
             chance = randint(1,100)
