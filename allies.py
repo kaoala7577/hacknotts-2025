@@ -1,7 +1,6 @@
 from Player import *
 from random import randint
 from inventory import *
-from generator import *
 import inventory
 
 class Allies:

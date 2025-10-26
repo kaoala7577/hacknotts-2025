@@ -5,43 +5,46 @@ from enemies import Enemy
 # GLOBALS
 ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
 
-# SEEDING
-#seed = random.randint(0, 1000000)
-seed = 5000 # fixed value for testing
-random.seed(seed)
-
-
-class Path:
-    def __init__(self, edge=0, start=False, end=False):
-        path_types = ['Dead End', 'Straight', 'Positive Corner', 'Negative Corner', 'Fork', 'Crossroads']
-        self.type = random.choice(path_types)
-
-        if end:
-            self.type = 'Dead End'
-
-        while start and self.type not in ['Fork', 'Crossroads']:
-            self.type = random.choice(path_types)
-
-        while edge == 1 and self.type in ['Positive Corner', 'Fork', 'Crossroads']:
-            self.type = random.choice(path_types)
-        while edge == -1 and self.type in ['Negative Corner', 'Fork', 'Crossroads']:
-            self.type = random.choice(path_types)
-
-
-
 class Encounter:
     def __init__(self, encounter=None):
-        encounters = Allies.__subclasses__() + Enemy.__subclasses__()
+        encounters = Allies.__subclasses__() + Enemy.__subclasses__() + ['Crossroads']
         self.encounter = encounter if encounter and encounter in encounters else random.choice(encounters)
         # further details can be added here later
 
 
 class Cell:
     def __init__(self, visible=False, edge=0, start=False, end=False):
-        self.path = Path(edge=edge, start=start, end=end)
-        self.encounter = Encounter() if random.randint(1, 100) <= ENCOUNTER_CHANCE else None
+        
+        path_types = ['Dead End', 'Straight', 'Positive Corner', 'Negative Corner', 'Fork', 'Crossroads']
+        self.path = 'Dead End' if end else random.choice(path_types)
+
+        while start and self.path not in ['Fork', 'Crossroads']:
+            self.path = random.choice(path_types)
+
+        while edge == 1 and self.path in ['Positive Corner', 'Fork', 'Crossroads']:
+            self.path = random.choice(path_types)
+        
+        while edge == -1 and self.path in ['Negative Corner', 'Fork', 'Crossroads']:
+            self.path = random.choice(path_types)
+        
+        self.start = start
         self.visited = start
         self.visible = visible or start
+
+        self.encounter = Encounter() if random.randint(1, 100) <= ENCOUNTER_CHANCE else None
+        
+    
+    def get_valid_directions(self):
+        directions = []
+        if not self.start:
+            directions.append('down')
+        if self.path in ['Straight', 'Crossroads']:
+            directions.append('up')
+        if self.path in ['Positive Corner', 'Fork', 'Crossroads']:
+            directions.append('right')
+        if self.path in ['Negative Corner', 'Fork', 'Crossroads']:
+            directions.append('left')
+        return directions
 
 
 class Map:
@@ -57,7 +60,7 @@ class Map:
         for row in range(1, self.size):
             temp_row = [None for _ in range(self.size)]
             end = row == self.size - 1
-            while all(cell is None or (cell.path.type == 'Dead End' and not end) for cell in temp_row):
+            while all(cell is None or (cell.path == 'Dead End' and not end) for cell in temp_row):
                 for col in range(self.size):
                     pointer_cells = self.get_pointer_cells(row, col)
                     if pointer_cells:
@@ -67,25 +70,63 @@ class Map:
                         temp_row[col] = new_cell
             self.map_grid[row] = temp_row
 
+    def get_cell(self, row_index, col_index):
+        if 0 <= row_index < self.size and 0 <= col_index < self.size:
+            return self.map_grid[row_index][col_index]
+        return None
+
+    # get all cells that point to the given cell
     def get_pointer_cells(self, row_index, col_index):
         pointer_cells = []
         if self.map_grid[row_index-1][col_index] is not None and \
-                self.map_grid[row_index-1][col_index].path.type == 'Straight':
+                self.map_grid[row_index-1][col_index].path == 'Straight':
             pointer_cells.append((row_index-1, col_index))
         
-        if self.map_grid[row_index-2][col_index] is not None and \
-                self.map_grid[row_index-2][col_index].path.type == 'Crossroads':
+        elif self.map_grid[row_index-2][col_index] is not None and \
+                self.map_grid[row_index-2][col_index].path == 'Crossroads':
             pointer_cells.append((row_index-2, col_index))
 
         if col_index > 0 and self.map_grid[row_index-1][col_index-1] is not None and \
-                self.map_grid[row_index-1][col_index-1].path.type in ['Positive Corner', 'Fork', 'Crossroads']:
+                self.map_grid[row_index-1][col_index-1].path in ['Positive Corner', 'Fork', 'Crossroads']:
             pointer_cells.append((row_index-1, col_index-1))
 
         if col_index < self.size - 1 and self.map_grid[row_index-1][col_index+1] is not None and \
-                self.map_grid[row_index-1][col_index+1].path.type in ['Negative Corner', 'Fork', 'Crossroads']:
+                self.map_grid[row_index-1][col_index+1].path in ['Negative Corner', 'Fork', 'Crossroads']:
             pointer_cells.append((row_index-1, col_index+1))
 
         return pointer_cells
+    
+    # get all cells that the given cell points to
+    def get_pointing_cells(self, row_index, col_index):
+        pointing_cells = []
+        shape = self.map_grid[row_index][col_index].path
+
+        if shape == 'Straight':
+            if row_index + 1 < self.size and self.map_grid[row_index + 1][col_index] is not None:
+                pointing_cells.append((row_index + 1, col_index))
+        
+        elif shape == 'Crossroads':
+            if row_index + 2 < self.size and self.map_grid[row_index + 2][col_index] is not None:
+                pointing_cells.append((row_index + 2, col_index))
+        
+        if shape in ['Positive Corner', 'Fork', 'Crossroads']:
+            if row_index + 1 < self.size and col_index + 1 < self.size and \
+                    self.map_grid[row_index + 1][col_index + 1] is not None:
+                pointing_cells.append((row_index + 1, col_index + 1))
+        
+        if shape in ['Negative Corner', 'Fork', 'Crossroads']:
+            if row_index + 1 < self.size and col_index - 1 >= 0 and \
+                    self.map_grid[row_index + 1][col_index - 1] is not None:
+                pointing_cells.append((row_index + 1, col_index - 1))
+        
+        return pointing_cells
+
+    def visit_cell(self, row_index, col_index):
+        cell = self.map_grid[row_index][col_index]
+        if cell:
+            cell.visited = True
+            for pc in self.get_pointing_cells(row_index, col_index):
+                self.map_grid[pc[0]][pc[1]].visible = True
 
     def row_has_visible_cells(self, row_index):
         return any(cell and cell.visible for cell in self.map_grid[row_index-1])
@@ -132,17 +173,17 @@ class Map:
                 if cell:
                     if (visible_only and cell.visited) or not visible_only:
                         encounter = cell.encounter.encounter if cell.encounter else None
-                        if cell.path.type == 'Straight':
+                        if cell.path == 'Straight':
                             print("↑", end="")
-                        elif cell.path.type == 'Dead End':
+                        elif cell.path == 'Dead End':
                             print("X", end="")
-                        elif cell.path.type == 'Positive Corner':
+                        elif cell.path == 'Positive Corner':
                             print("┌", end="")
-                        elif cell.path.type == 'Negative Corner':
+                        elif cell.path == 'Negative Corner':
                             print("┐", end="")
-                        elif cell.path.type == 'Fork':
+                        elif cell.path == 'Fork':
                             print("Y", end="")
-                        elif cell.path.type == 'Crossroads':
+                        elif cell.path == 'Crossroads':
                             print("+", end="")
 
                         if encounter:
