@@ -14,7 +14,7 @@ class Enemy:
         self.pMoney = Player.getGold(self)
         if self.enemy_type == "Bandits":
             if self.trade_amount > self.pMoney:
-                self.Inventory.banditsSteal(inventory,self,prefer_highest=True)
+                self.inventory.banditsSteal(inventory,self,prefer_highest=True)
                 return "The bandits are displeased with your offer and steal from you."
             else:
                 self.newGold = self.addGold(-self.trade_amount)
