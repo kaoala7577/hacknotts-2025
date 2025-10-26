@@ -1,15 +1,28 @@
 import random
 from allies import Allies
 from enemies import Enemy
+from Player import *    
 
 # GLOBALS
 ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
 
 # SEEDING
 #seed = random.randint(0, 1000000)
-seed = 5000 # fixed value for testing
-random.seed(seed)
+#seed = 5000 # fixed value for testing
+#random.seed(seed)
 
+#Returns a tuple/list
+def constructDirection(pType):
+    returnList = []
+    if pType == "Straight" or pType == "Crossroads":
+        returnList.append("Travel North")
+    if pType == "Positive Corner" or pType == "Fork" or pType == "Crossroads":
+        returnList.append("Travel East")
+    returnList.append("Travel South")
+    if pType == "Negative Corner" or pType == "Fork" or pType == "Crossroads":
+        returnList.append("Travel West")
+
+    return returnList
 
 class Path:
     def __init__(self, edge=0, start=False, end=False):
@@ -27,14 +40,14 @@ class Path:
         while edge == -1 and self.type in ['Negative Corner', 'Fork', 'Crossroads']:
             self.type = random.choice(path_types)
 
+    def getType(self):
+        return self.type
 
 
 class Encounter:
     def __init__(self, encounter=None):
         encounters = Allies.__subclasses__() + Enemy.__subclasses__()
         self.encounter = encounter if encounter and encounter in encounters else random.choice(encounters)
-        # further details can be added here later
-
 
 class Cell:
     def __init__(self, visible=False, edge=0, start=False, end=False):
@@ -66,6 +79,18 @@ class Map:
                         new_cell = Cell(visible=visible, edge=edge, end=end)
                         temp_row[col] = new_cell
             self.map_grid[row] = temp_row
+
+    def getMapTypeByLocation(self, player):
+        locX = player.getLocationX()
+        locY = player.getLocationY()
+        if locY < 0 or locX < 0:
+            return None
+        if self.map_grid[locY][locX] == None:
+            return None
+        return self.map_grid[locY][locX].path.type
+
+    def getCellByTileLocation(self, player):
+        return self.map_grid[player.getLocationY()][player.getLocationX()]
 
     def get_pointer_cells(self, row_index, col_index):
         pointer_cells = []

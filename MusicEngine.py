@@ -16,7 +16,7 @@ class MusicPlayer():
         self.forceSilent = False
         self.stop = False
         self.circular = 0
-        self.QUIT = True      
+        self.QUIT = False      
 
     def sleeper(self):
         time.sleep(self.DURATION[self.circular])
@@ -29,6 +29,8 @@ class MusicPlayer():
             if self.forceSilent:
                 time.sleep(0)
                 if self.QUIT:
+                    winsound.PlaySound(None, winsound.SND_ASYNC)
+                    t1.terminate()
                     return
                 continue
             winsound.PlaySound(self.MUSIC[self.circular], winsound.SND_ASYNC | winsound.SND_FILENAME)
@@ -40,13 +42,16 @@ class MusicPlayer():
                 if self.stop:
                     winsound.PlaySound(None, winsound.SND_ASYNC)
                     t1.terminate()
-                    
                     self.stop = False
-                    print("STOP")
                     break
                 if self.QUIT:
+                    winsound.PlaySound(None, winsound.SND_ASYNC)
+                    t1.terminate()
                     return
                 time.sleep(0)
+        print("Goodbye")
+        t1.terminate()
+        return 0
 
     def musicSilence(self):
         self.forceSilent = True

@@ -21,7 +21,7 @@ class Player():
         self.locX = 0
         self.locY = 0
 
-        self.inventory = Inventory()
+        self.inventory = inventory()
 
     def __repr__(self):
         return self.name
