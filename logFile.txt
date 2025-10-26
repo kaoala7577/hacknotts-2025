@@ -108,8 +108,11 @@ Start of new session.
 
 Start of new session.
 ----------------
+<<<<<<< HEAD
 ----------------
 End of current session.
+=======
+>>>>>>> fee31238df2cd91d1279e57a972c95b3a2dc3f41
 
 Start of new session.
 ----------------
@@ -122,30 +125,7 @@ Start of new session.
 
 Start of new session.
 ----------------
-----------------
-End of current session.
-
-Start of new session.
-----------------
-----------------
-End of current session.
-
-Start of new session.
-----------------
-----------------
-End of current session.
-
-Start of new session.
-----------------
-
-Start of new session.
-----------------
-
-Start of new session.
-----------------
-
-Start of new session.
-----------------
+<<<<<<< HEAD
 ----------------
 End of current session.
 
@@ -158,6 +138,18 @@ Start of new session.
 ----------------
 ----------------
 End of current session.
+=======
+>>>>>>> fee31238df2cd91d1279e57a972c95b3a2dc3f41
+
+Start of new session.
+----------------
+
+Start of new session.
+----------------
+
+Start of new session.
+----------------
+<<<<<<< HEAD
 
 Start of new session.
 ----------------
@@ -173,3 +165,20 @@ Start of new session.
 ----------------
 ----------------
 End of current session.
+
+Start of new session.
+----------------
+----------------
+End of current session.
+
+Start of new session.
+----------------
+----------------
+End of current session.
+
+Start of new session.
+----------------
+----------------
+End of current session.
+=======
+>>>>>>> fee31238df2cd91d1279e57a972c95b3a2dc3f41

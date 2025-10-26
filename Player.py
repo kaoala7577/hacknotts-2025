@@ -12,31 +12,31 @@ class Player():
     def loseItem(self, item):
         self.inventory.removeItem(item, itemRarity)
 
-    def __init__(self, fileHandler, logger):
+    def __init__(self, name, fileHandler, logger):
         self.fileHandler = fileHandler
         self.logger = logger
         self.gold = 0
         self.health = 10
-        self.name = ""
-        self.locX = 0
-        self.locY = 0
+        self.name = name
+        self.row = 0
+        self.col = 0
 
         self.inventory = inventory()
 
     def __repr__(self):
         return self.name
 
-    def setLocationX(self, locX):
-        self.locX = locX
+    def setCol(self, col):
+        self.col = col
 
-    def getLocationX(self):
-        return self.locX
-    
-    def setLocationY(self, locY):
-        self.locY = locY
+    def getCol(self):
+        return self.col
 
-    def getLocationY(self):
-        return self.locY
+    def setRow(self, row):
+        self.row = row
+
+    def getRow(self):
+        return self.row
 
     def setName(self, name):
         self.name = name

@@ -27,7 +27,6 @@ _ _ _ _ _ _ _   _ _ _ _ _ _ _ _    _ _ _     _ _ _     _ _ _ _ _ _ _      _ _ _ 
 
 =================================================================================================================================""")
 
-
 logger = LOGGER()
 fileHandler  = FileHandler(logger)
 
@@ -146,8 +145,6 @@ while gameLoopRuns:
     ##Present options
 
     ##Respond to player option
-
-
 
 musicEngine.musicSilence()
 musicEngine.complete()
