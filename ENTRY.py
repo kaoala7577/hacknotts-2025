@@ -100,7 +100,6 @@ def create_player() -> Player:
 
     print(f"Welcome, {player}! Your adventure begins now...\n")
     time.sleep(3)
-    clearScreen()
     return player
     
 #==============================================================================
@@ -129,7 +128,6 @@ def move_player(map, player) -> Cell:
     elif direction == 'up':
         new_cell = next(cell for cell in next_cells if cell[0] > player.row)
     elif direction == 'down':
-        player.setRow(player.getRow()-1)
         new_cell = next(cell for cell in next_cells if cell[0] < player.row)
 
     player.setRow(new_cell[0])
