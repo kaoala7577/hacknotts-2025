@@ -106,7 +106,9 @@ def create_player() -> Player:
 #==============================================================================
 #movement
 def move_player(map, player) -> Cell:
+    print(f"Row: {player.row} Col: {player.col}")
     current_cell = map.get_cell(player.row, player.col)
+
     valid_directions = current_cell.get_valid_directions()
 
     map.display_map()
@@ -117,7 +119,8 @@ def move_player(map, player) -> Cell:
         print("You can't go that way!")
         direction = input("Where to next? ").lower()
         
-    next_cells = map.get_pointing_cells(player.row, player.col)
+    next_cells = map.get_pointing_cells(player.row, player.col) + map.get_pointer_cells(player.row, player.col)
+    next_cells = list(dict.fromkeys(next_cells)) # remove duplicates
     new_cell = None
 
     if direction == 'right':
@@ -129,8 +132,9 @@ def move_player(map, player) -> Cell:
     elif direction == 'down':
         new_cell = next(cell for cell in next_cells if cell[0] < player.row)
 
-    player.setRow = new_cell[0]
-    player.setCol = new_cell[1]
+    print(f"New cell: {new_cell} row {new_cell[0]} col {new_cell[1]}")
+    player.setRow(new_cell[0])
+    player.setCol(new_cell[1])
     map.visit_cell(new_cell[0], new_cell[1])
     return map.get_cell(new_cell[0], new_cell[1])
 
@@ -138,8 +142,9 @@ def move_player(map, player) -> Cell:
 #encounters
 def encounter(map, player):
     cell = map.get_cell(player.row, player.col)
-    encounter = cell.encounter
-    
+    encounter = cell.encounter.encounter
+
+    print(dir(encounter))
 
 
 #=============================================================================
@@ -160,7 +165,7 @@ def game_loop(map, player):
         cell = move_player(map, player)
 
         if cell.encounter != None:
-            print("I have an encounter too!")
+            encounter(map, player)
         
         ##Draw location scene
 
@@ -172,6 +177,7 @@ def game_loop(map, player):
 def main():
     set_seed()
     map = generate_map()
+    map.display_map(False)
     player = create_player()
     player.setCol(map.size // 2)
 
@@ -179,7 +185,7 @@ def main():
     musicPlayer = threading.Thread(target=musicEngine.musicPlayer, daemon=True)
     musicPlayer.start()
 
-    move_player(map, player)
+    game_loop(map, player)
 
     musicEngine.musicSilence()
     musicEngine.complete()
