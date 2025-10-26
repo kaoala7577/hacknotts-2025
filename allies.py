@@ -5,7 +5,7 @@ from inventory import *
 class Allies:
     def __init__(self, player, allyType = None):
         self.allyType = allyType
-        self.player = player
+        self.Inventory = inventory()
 
 
 class Healer(Allies):
