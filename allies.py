@@ -1,5 +1,5 @@
 from Player import *
-from random import randint
+from random import randint, choice
 from inventory import *
 import inventory
 
@@ -75,35 +75,39 @@ class Knight(Allies):
 class Tavern(Allies):
     def __init__(self):
         super().__init__("Tavern")
-        self.location = ["Village","Town","City","Fortress","Castle"]
-        self.TavernLocation = self.location[randint(0,len(self.location)-1)]
-        if self.TavernLocation == "village":
+        print('making a tavern')
+        locations = ["Village","Town","City","Fortress","Castle"]
+        self.TavernLocation = choice(locations)
+        print(f'tavern location is {self.TavernLocation}')
+        if self.TavernLocation == "Village":
             self.opening_text = "You have arrived at a small village tavern. You rest amongst the friendly villagers, but realise you need to keep moving on your quest regardless of the warm welcome. After a brief respite, you continue your journey, feeling slightly more refreshed. Your health increases by 10 points."
             self.pHealth = self.getHealth()
             self.pHealth += 10
             self.setHealth(self.pHealth)
             self.closing_text = f"Your health is now {self.pHealth}."
         
-        elif self.TavernLocation == "town":
+        elif self.TavernLocation == "Town":
             self.opening_text = "You have stumbled upon a bustling town tavern filled with cheerful town folk and excited adventurers. You decide to settle here briefly, enjoying the lively atmosphere. After a hearty meal and some rest, you feel rejuvenated, and your health increases by 15 points."
             self.pHealth = self.getHealth()
             self.pHealth += 15
             self.setHealth(self.pHealth)
             self.closing_text = f"Your health is now {self.pHealth}."
         
-        elif self.TavernLocation == "city":
+        elif self.TavernLocation == "City":
             self.opening_text = "You enter a grand city tavern, where the air is filled with the sounds of music and laughter. You take a moment to relax and mingle with the vivacious city dwellers. After a night filled with merriment (and potential hangover), you gather your strength and your health increases by 20 points."
             self.pHealth = self.getHealth()
             self.pHealth += 20
             self.setHealth(self.pHealth)
             self.closing_text = f"Your health is now {self.pHealth}."
-        elif self.TavernLocation == "fortress":
+        
+        elif self.TavernLocation == "Fortress":
             self.opening_text = "You find yourself in a fortified tavern within a mighty fortress. The atmosphere is filled with tales of valor and bravery. You take a moment to rest among the seasoned warriors, gaining inspiration from their stories. After some time, you feel invigorated, and your health increases by 25 points."
             self.pHealth = self.getHealth()
             self.pHealth += 25
             self.setHealth(self.pHealth)
             self.closing_text =  f"Your health is now {self.pHealth}."
-        elif self.TavernLocation == "castle":
+        
+        elif self.TavernLocation == "Castle":
             self.opening_text = "You are granted the rare privilege of entering a lavish castle tavern only frequented by royalty, nobles and distinguished guests. The opulence and grandeur of the surroundings initially overwhelm you, but you soon find yourself relaxing and getting used to the taste of luxury. Alas after a night of indulgence and extravagance, you must continue your quest though you will miss the comforts of the castle. Your health increases by 30 points."
             self.pHealth = self.getHealth()
             self.pHealth += 30

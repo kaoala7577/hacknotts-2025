@@ -1,6 +1,6 @@
 import random
-from allies import Allies
-from enemies import Enemy
+from allies import *
+from enemies import *
 from Player import *    
 
 # GLOBALS
@@ -13,8 +13,13 @@ ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
 
 class Encounter:
     def __init__(self, encounter=None):
-        encounters = Allies.__subclasses__() + Enemy.__subclasses__()
+        encounters = [Healer, OldLady, Knight, Tavern, Wolves, Dragon, Barbarians, Bandits]
         self.encounter = encounter if encounter and encounter in encounters else random.choice(encounters)
+
+        if self.encounter == Healer or self.encounter == OldLady or self.encounter == Knight or self.encounter == Tavern:
+            self.encounterType = "Ally"
+        else:
+            self.encounterType = "Enemy"
 
 class Cell:
     def __init__(self, visible=False, edge=0, start=False, end=False):

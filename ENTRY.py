@@ -108,7 +108,10 @@ def create_player() -> Player:
 def move_player(map, player) -> Cell:
     print(player.row)
     print(player.col)
+
+    print(f"Row: {player.row} Col: {player.col}")
     current_cell = map.get_cell(player.row, player.col)
+
     valid_directions = current_cell.get_valid_directions()
 
     map.display_map()
@@ -119,41 +122,40 @@ def move_player(map, player) -> Cell:
         print("You can't go that way!")
         direction = input("Where to next? ").lower()
         
-    next_cells = map.get_pointing_cells(player.row, player.col)
+    next_cells = map.get_pointing_cells(player.row, player.col) + map.get_pointer_cells(player.row, player.col)
+    next_cells = list(dict.fromkeys(next_cells)) # remove duplicates
     new_cell = None
 
     if direction == 'right':
-        player.setCol(player.getCol()+1)
-        player.setRow(player.getRow()+1)
-        #new_cell = next(cell for cell in next_cells if cell[1] > player.col)
+        new_cell = next(cell for cell in next_cells if cell[1] > player.col)
     elif direction == 'left':
-        player.setCol(player.getCol()-1)
-        player.setRow(player.getRow()+1)
-        #new_cell = next(cell for cell in next_cells if cell[1] < player.col)
+        new_cell = next(cell for cell in next_cells if cell[1] < player.col)
     elif direction == 'up':
-        if map.get_cell(player.getRow(), player.getCol()).path == "Crossroads":
-            player.setRow(player.getRow()+1)
-        player.setRow(player.getRow()+1)
-        #new_cell = next(cell for cell in next_cells if cell[0] > player.row)
+        new_cell = next(cell for cell in next_cells if cell[0] > player.row)
     elif direction == 'down':
         player.setRow(player.getRow()-1)
-        if map.get_cell(player.getRow()-1, player.getCol()).path == "Crossroads":
-            player.setRow(player.getRow()-1)
-        #new_cell = next(cell for cell in next_cells if cell[0] < player.row)
-
+        new_cell = next(cell for cell in next_cells if cell[0] < player.row)
     #player.setRow = new_cell[0]
     #player.setCol = new_cell[1]
     print(player.getCol())
-    print(player.getRow())
-    map.visit_cell(player.getRow(), player.getCol())
-    return map.get_cell(player.getRow(), player.getCol())
+#    print(player.getRow())
+#    map.visit_cell(player.getRow(), player.getCol())
+#    return map.get_cell(player.getRow(), player.getCol())
+    print(f"New cell: {new_cell} row {new_cell[0]} col {new_cell[1]}")
+    player.setRow(new_cell[0])
+    player.setCol(new_cell[1])
+    map.visit_cell(new_cell[0], new_cell[1])
+    return map.get_cell(new_cell[0], new_cell[1])
 
 #==============================================================================
 #encounters
 def encounter(map, player):
     cell = map.get_cell(player.row, player.col)
-    encounter = cell.encounter
-    
+    encounter = cell.encounter.encounter()
+    if cell.encounter.encounterType == "Ally":
+        pass##DO ALLY STUFF
+    else:
+        pass##DO ENEMY STUFF
 
 
 #=============================================================================
@@ -173,7 +175,7 @@ def game_loop(map, player):
     while gameLoopRuns:
         cell = move_player(map, player)
         if cell.encounter != None:
-            print("I have an encounter too!")
+            encounter(map, player)
         
         ##Draw location scene
 
@@ -185,6 +187,7 @@ def game_loop(map, player):
 def main():
     set_seed()
     map = generate_map()
+    map.display_map(False)
     player = create_player()
     player.setCol(map.size // 2)
 
