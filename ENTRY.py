@@ -27,60 +27,64 @@ _ _ _ _ _ _ _   _ _ _ _ _ _ _ _    _ _ _     _ _ _     _ _ _ _ _ _ _      _ _ _ 
 
 =================================================================================================================================""")
 
-logger = LOGGER()
-fileHandler  = FileHandler(logger)
-
-char = Player(fileHandler, logger)
 time.sleep(4)
 print("\nWelcome, Adventurer! Please select one of the following options to begin:\n")
 
 mResponse = callInputNumeric(("Select an existing player file", "Create a new game"))
 
-mapSize = 10
-
 if mResponse == 1:
     print("Not yet implemented, defaulting to option 2. sorry!")
     
-elif mResponse == 2:
-    selectedSeed = input("\nPlease enter game seed, or leave blank to gain a random seed:")
+# elif mResponse == 2:
+
+# set the seed
+def set_seed(seed=0):
+    selectedSeed = input("\nPlease enter game seed, or leave blank to gain a random seed: ")
     if selectedSeed == "":
-        selectedSeed = random.randint(1, 4000000)
+        selectedSeed = seed if seed>0 else random.randint(1, 4000000)
     random.seed(selectedSeed)
-    answer = ""
+    print(f"Selected seed: {selectedSeed}")
+
+#==============================================================================
+##generate the game map
+
+def generate_map() -> Map:
+    map_size = 10
     while True:
-        print(f"\nMAP SIZE: {mapSize}\n")
+        print(f"\nMAP SIZE: {map_size}\n")
 
         answer = input("change map size? (Y/N)").upper()
         if answer != "Y" and answer != "N":
             print("That is not a valid option!")
+            continue
         if answer == "Y":
             try:
-                mapSize = int(input("Please enter a numerical value greater than 10: "))
-                if mapSize < 10:
-                    print("That map size is too small!")
-                    mapSize = 10
+                map_size = int(input("Please enter a numerical value greater than 10: "))
+                if map_size < 10:
+                    print("That map size is too small! Setting to 10.")
+                    map_size = 10
             except:
                 print("That is not a number!")
             answer = ""
         elif answer == "N":
             break
 
-
-    print(f"Selected seed: {selectedSeed}.")
-    print(f"Map size: {mapSize}.\n\n")
+    print(f"Map size: {map_size}.\n\n")
     time.sleep(3)
     clearScreen()
     print("Generating Map...")
+    return Map(map_size)
 
-    #==============================================================================
-    ##Create the player character
+#==============================================================================
+##Create the player character
 
-
+def create_player() -> Player:
+    character_name = None
     while True:
-        characterName = input("Please choose a name for your character: ")
+        character_name = input("Please choose a name for your character: ")
         resolve = False
         while not resolve:
-            valid = input(f"\n{characterName}... Is this okay? (Y/N)").upper()
+            valid = input(f"\n{character_name}... Is this okay? (Y/N) ").upper()
             if valid == "Y":
                 resolve = True
             elif valid == "N":
@@ -88,65 +92,99 @@ elif mResponse == 2:
             else:
                 print("That is not a valid answer.")
         if resolve:
-                  break
+            break
 
-    char.setName(valid)
+    logger = LOGGER()
+    file_handler = FileHandler(logger)
+    player = Player(character_name, file_handler, logger)
 
-gameMap = Map(size=mapSize)
-gameMap.display_map(False)
-clearScreen()
-time.sleep(2)
+    print(f"Welcome, {player}! Your adventure begins now...\n")
+    time.sleep(3)
+    clearScreen()
+    return player
+    
+#==============================================================================
+#movement
+def move_player(map, player) -> Cell:
+    current_cell = map.get_cell(player.row, player.col)
+    valid_directions = current_cell.get_valid_directions()
 
-musicEngine = MusicPlayer()
-musicPlayer = threading.Thread(target=musicEngine.musicPlayer, daemon=True)
-musicPlayer.start()
+    map.display_map()
+    print("   ".join(valid_directions).title())
+
+    direction = input("Where to next? ").lower()
+    while direction not in valid_directions:
+        print("You can't go that way!")
+        direction = input("Where to next? ").lower()
+        
+    next_cells = map.get_pointing_cells(player.row, player.col)
+    new_cell = None
+
+    if direction == 'right':
+        new_cell = next(cell for cell in next_cells if cell[1] > player.col)
+    elif direction == 'left':
+        new_cell = next(cell for cell in next_cells if cell[1] < player.col)
+    elif direction == 'up':
+        new_cell = next(cell for cell in next_cells if cell[0] > player.row)
+    elif direction == 'down':
+        new_cell = next(cell for cell in next_cells if cell[0] < player.row)
+
+    player.setRow = new_cell[0]
+    player.setCol = new_cell[1]
+    map.visit_cell(new_cell[0], new_cell[1])
+    return map.get_cell(new_cell[0], new_cell[1])
+
+#==============================================================================
+#encounters
+def encounter(map, player):
+    cell = map.get_cell(player.row, player.col)
+    encounter = cell.encounter
+    
 
 
 #=============================================================================
 ##Game Reset
-if mResponse == 2:
-    char.setHealth(10)
-    char.setGold(10)
-    char.setLocationY(0)
-    for x in gameMap.map_grid[0]:
+def reset(map, player):
+    player.setHealth(10)
+    player.setGold(10)
+    player.setRow(0)
+    for x in map.map_grid[0]:
         if x != None:
-            char.setLocationX(gameMap.map_grid[0].index(x))
+            player.setCol(map.map_grid[0].index(x))
 
-gameLoopRuns = True
-while gameLoopRuns:
-    mTravelOptions = constructDirection(gameMap.getMapTypeByLocation(char))
+#=============================================================================
+##Game Reset
+def game_loop(map, player):
+    gameLoopRuns = True
+    while gameLoopRuns:
+        cell = move_player(map, player)
 
-    print(f"{char} enters the room.")
-
-    mCell = gameMap.getCellByTileLocation(char)
-    if mCell.encounter != None:
-        print("I have an encounter too!")
-
-    result = callInputNumeric(mTravelOptions)
-    initialLocX = char.getLocationX()
-    initialLocY = char.getLocationY()
-    if result == 1:
-        char.setLocationY(initialLocY+1)
-    elif result == 2:
-        char.setLocationX(initialLocX+1)
-    elif result == 3:
-        char.setLocationY(initialLocY-1)
-    elif result == 4:
-        char.setLocationX(initialLocX-1)
+        if cell.encounter != None:
+            print("I have an encounter too!")
         
-    #Okay this is accurate, the generation is off.
-    if gameMap.getMapTypeByLocation(char) == None:
-        print("\nUnfortunately that way has been blocked.\n")
-        char.setLocationX(initialLocX)
-        char.setLocationY(initialLocY)
-        
-    ##Draw location scene
+        ##Draw location scene
 
-    ##Present options
+        ##Present options
 
-    ##Respond to player option
+        ##Respond to player option
 
-musicEngine.musicSilence()
-musicEngine.complete()
-logger.log(None, "CLOSE")
-musicPlayer.join()
+
+def main():
+    set_seed()
+    map = generate_map()
+    player = create_player()
+    player.setCol(map.size // 2)
+
+    musicEngine = MusicPlayer()
+    musicPlayer = threading.Thread(target=musicEngine.musicPlayer, daemon=True)
+    musicPlayer.start()
+
+    move_player(map, player)
+
+    musicEngine.musicSilence()
+    musicEngine.complete()
+    player.logger.log(None, "CLOSE")
+    musicPlayer.join()
+
+if __name__ == "__main__":
+    main()

@@ -86,9 +86,9 @@ class Player():
         hexData = hexData[4:]
         self.setGold(int(bitJoin32(hexData[:4]), base=16))
         hexData = hexData[4:]
-        self.setLocationX(int(bitJoin32(hexData[:4]), base=16))
+        self.setCol(int(bitJoin32(hexData[:4]), base=16))
         hexData = hexData[4:]
-        self.setLocationY(int(bitJoin32(hexData[:4]), base=16))
+        self.setRow(int(bitJoin32(hexData[:4]), base=16))
         hexData = hexData[4:]
         self.setSeed(int(bitJoin32(hexData[:4]), base=16))
         hexData = hexData[4:]

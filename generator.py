@@ -11,41 +11,9 @@ ENCOUNTER_CHANCE = 50  # percentage chance of any encounter occurring
 #seed = 5000 # fixed value for testing
 #random.seed(seed)
 
-#Returns a tuple/list
-#def constructDirection(pType):
-#    returnList = []
-#    if pType == "Straight" or pType == "Crossroads":
-#        returnList.append("Travel North")
-#    if pType == "Positive Corner" or pType == "Fork" or pType == "Crossroads":
-#        returnList.append("Travel East")
-#    returnList.append("Travel South")
-#    if pType == "Negative Corner" or pType == "Fork" or pType == "Crossroads":
-#        returnList.append("Travel West")
-
-#    return returnList
-
-class Path:
-    def __init__(self, edge=0, start=False, end=False):
-        path_types = ['Dead End', 'Straight', 'Positive Corner', 'Negative Corner', 'Fork', 'Crossroads']
-        self.type = random.choice(path_types)
-
-        if end:
-            self.type = 'Dead End'
-
-        while start and self.type not in ['Fork', 'Crossroads']:
-            self.type = random.choice(path_types)
-
-        while edge == 1 and self.type in ['Positive Corner', 'Fork', 'Crossroads']:
-            self.type = random.choice(path_types)
-        while edge == -1 and self.type in ['Negative Corner', 'Fork', 'Crossroads']:
-            self.type = random.choice(path_types)
-
-    def getType(self):
-        return self.type
-
 class Encounter:
     def __init__(self, encounter=None):
-        encounters = Allies.__subclasses__() + Enemy.__subclasses__() + ['Crossroads']
+        encounters = Allies.__subclasses__() + Enemy.__subclasses__()
         self.encounter = encounter if encounter and encounter in encounters else random.choice(encounters)
 
 class Cell:
@@ -105,18 +73,6 @@ class Map:
                         new_cell = Cell(visible=visible, edge=edge, end=end)
                         temp_row[col] = new_cell
             self.map_grid[row] = temp_row
-
-    def getMapTypeByLocation(self, player):
-        locX = player.getLocationX()
-        locY = player.getLocationY()
-        if locY < 0 or locX < 0:
-            return None
-        if self.map_grid[locY][locX] == None:
-            return None
-        return self.map_grid[locY][locX].path.type
-
-    def getCellByTileLocation(self, player):
-        return self.map_grid[player.getLocationY()][player.getLocationX()]
 
     def get_cell(self, row_index, col_index):
         if 0 <= row_index < self.size and 0 <= col_index < self.size:
