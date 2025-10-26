@@ -5,20 +5,21 @@ import inventory
 
 #enemy class that stores all the enemies in the game
 class Enemy:
-    def __init__(self,enemy_type=None):
+    def __init__(self,player,enemy_type=None):
         self.enemy_type = enemy_type
         self.choices = ["attack","trade","run away"]
         self.trade_amount = randint(10,10000)
         self.strength = randint(1,100)
-    def trade(self,enemy_type):
+        self.player = player
+    def trade(self):
         self.pMoney = Player.getGold(self)
         if self.enemy_type == "Bandits":
-            if self.trade_amount > self.pMoney:
-                self.inventory.banditsSteal(inventory,self,prefer_highest=True)
+            if self.trade_amount > self.player.gold:
+                self.player.inventory.banditsSteal(inventory,self,prefer_highest=True)
                 self.closing_text = "The bandits are displeased with your offer and steal from you."
             else:
-                self.newGold = self.addGold(-self.trade_amount)
-                self.setGold(self.newGold)
+                self.newGold = self.player.addGold(-self.trade_amount)
+                self.player.setGold(self.newGold)
                 self.closing_text = "The bandits accept your offer and let you go." 
         elif self.enemy_type == "Barbarians":
             if  self.pMoney < self.trade_amount:
@@ -101,10 +102,11 @@ class Enemy:
 
 
 class Wolves(Enemy):
-    def __init__(self):
-        super().__init__("Wolves")
+    def __init__(self, player):
+        super().__init__(player, "Wolves")
         self.number = randint(1,10)
         self.opening_text = f"{self.number} wolves surround you!"
+        self.image = "🐺"
         self.choices = ["attack","run away"]
         if self.choices == "attack":
             result = self.attack("Wolves")
@@ -122,9 +124,10 @@ class Wolves(Enemy):
 
    
 class Dragon (Enemy):
-    def __init__(self):
-        super().__init__("Dragon")
+    def __init__(self, player):
+        super().__init__(player, "Dragon")
         self.opening_text = "A dragon is attacking you!"
+        self.image = "🐉"
         self.Dhealth = 100
         self.choices = ["attack","run away"]
         if self.choices == "attack":
@@ -134,7 +137,7 @@ class Dragon (Enemy):
             result = self.runAway("Dragon")
             return result
     def winChance(self):
-        self.pHealth = self.getHealth()
+        self.pHealth = self.player.getHealth()
         if self.pHealth < self.Dhealth:
             return randint(1,25)
         elif self.pHealth == self.Dhealth:
@@ -145,9 +148,10 @@ class Dragon (Enemy):
         
 
 class Barbarians (Enemy):
-    def __init__(self):
-        super().__init__("Barbarians")
+    def __init__(self, player):
+        super().__init__(player, "Barbarians")
         self.opening_text = "Barbarians are looking at you menacingly."
+        self.image = "👊"
         self.strength = randint(50,100)
         self.trade_amount = randint(10,75)
         self.choices = ["attack","trade","run away"]
@@ -164,9 +168,10 @@ class Barbarians (Enemy):
        
     
 class Bandits(Enemy):
-    def __init__(self):
-        super().__init__("Bandits")
+    def __init__(self, player):
+        super().__init__(player, "Bandits")
         self.opening_text = "Bandits surround you!"
+        self.image = "🗡️"
         self.steal_amount = randint(5,25)
         self.trade_amount = randint(1,50)
         self.choices = ["attack","trade","run away"]
@@ -180,7 +185,7 @@ class Bandits(Enemy):
             result = self.runAway("Bandits")
             return result
         
-    def banditsSteal(self, prefer_highest=True):
+    def banditsSteal(self, inventory, prefer_highest=True):
         removed = []
 
         if not self.items:

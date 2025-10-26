@@ -48,7 +48,7 @@ def set_seed(seed=0):
 #==============================================================================
 ##generate the game map
 
-def generate_map() -> Map:
+def generate_map(player) -> Map:
     map_size = 10
     while True:
         print(f"\nMAP SIZE: {map_size}\n")
@@ -73,7 +73,7 @@ def generate_map() -> Map:
     time.sleep(3)
     clearScreen()
     print("Generating Map...")
-    return Map(map_size)
+    return Map(player, map_size)
 
 #==============================================================================
 ##Create the player character
@@ -106,10 +106,6 @@ def create_player() -> Player:
 #==============================================================================
 #movement
 def move_player(map, player) -> Cell:
-    print(player.row)
-    print(player.col)
-
-    print(f"Row: {player.row} Col: {player.col}")
     current_cell = map.get_cell(player.row, player.col)
 
     valid_directions = current_cell.get_valid_directions()
@@ -135,13 +131,7 @@ def move_player(map, player) -> Cell:
     elif direction == 'down':
         player.setRow(player.getRow()-1)
         new_cell = next(cell for cell in next_cells if cell[0] < player.row)
-    #player.setRow = new_cell[0]
-    #player.setCol = new_cell[1]
-    print(player.getCol())
-#    print(player.getRow())
-#    map.visit_cell(player.getRow(), player.getCol())
-#    return map.get_cell(player.getRow(), player.getCol())
-    print(f"New cell: {new_cell} row {new_cell[0]} col {new_cell[1]}")
+
     player.setRow(new_cell[0])
     player.setCol(new_cell[1])
     map.visit_cell(new_cell[0], new_cell[1])
@@ -151,7 +141,19 @@ def move_player(map, player) -> Cell:
 #encounters
 def encounter(map, player):
     cell = map.get_cell(player.row, player.col)
-    encounter = cell.encounter.encounter()
+    encounter = cell.encounter.encounter if cell.encounter else None
+    if not encounter:
+        print('\nYou reach a peaceful clearing.\n')
+        return
+    
+    print(encounter.opening_text)
+    print("I haven't implemented actual functionality yet sorry")
+    try:
+        
+        print(encounter.closing_text)
+    except:
+        print("...which means this can't finish properly either")
+
     if cell.encounter.encounterType == "Ally":
         pass##DO ALLY STUFF
     else:
@@ -172,23 +174,20 @@ def reset(map, player):
 ##Game Reset
 def game_loop(map, player):
     gameLoopRuns = True
+    cell = map.get_cell(player.row, player.col)
     while gameLoopRuns:
-        cell = move_player(map, player)
-        if cell.encounter != None:
+        # run cell encounter
+        if cell.encounter is not None:
             encounter(map, player)
         
-        ##Draw location scene
-
-        ##Present options
-
-        ##Respond to player option
+        # move to next cell
+        cell = move_player(map, player)
 
 
 def main():
     set_seed()
-    map = generate_map()
-    map.display_map(False)
     player = create_player()
+    map = generate_map(player)
     player.setCol(map.size // 2)
 
     musicEngine = MusicPlayer()
