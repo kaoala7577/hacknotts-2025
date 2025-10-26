@@ -106,6 +106,8 @@ def create_player() -> Player:
 #==============================================================================
 #movement
 def move_player(map, player) -> Cell:
+    print(player.row)
+    print(player.col)
     current_cell = map.get_cell(player.row, player.col)
     valid_directions = current_cell.get_valid_directions()
 
@@ -121,18 +123,30 @@ def move_player(map, player) -> Cell:
     new_cell = None
 
     if direction == 'right':
-        new_cell = next(cell for cell in next_cells if cell[1] > player.col)
+        player.setCol(player.getCol()+1)
+        player.setRow(player.getRow()+1)
+        #new_cell = next(cell for cell in next_cells if cell[1] > player.col)
     elif direction == 'left':
-        new_cell = next(cell for cell in next_cells if cell[1] < player.col)
+        player.setCol(player.getCol()-1)
+        player.setRow(player.getRow()+1)
+        #new_cell = next(cell for cell in next_cells if cell[1] < player.col)
     elif direction == 'up':
-        new_cell = next(cell for cell in next_cells if cell[0] > player.row)
+        if map.get_cell(player.getRow(), player.getCol()).path == "Crossroads":
+            player.setRow(player.getRow()+1)
+        player.setRow(player.getRow()+1)
+        #new_cell = next(cell for cell in next_cells if cell[0] > player.row)
     elif direction == 'down':
-        new_cell = next(cell for cell in next_cells if cell[0] < player.row)
+        player.setRow(player.getRow()-1)
+        if map.get_cell(player.getRow()-1, player.getCol()).path == "Crossroads":
+            player.setRow(player.getRow()-1)
+        #new_cell = next(cell for cell in next_cells if cell[0] < player.row)
 
-    player.setRow = new_cell[0]
-    player.setCol = new_cell[1]
-    map.visit_cell(new_cell[0], new_cell[1])
-    return map.get_cell(new_cell[0], new_cell[1])
+    #player.setRow = new_cell[0]
+    #player.setCol = new_cell[1]
+    print(player.getCol())
+    print(player.getRow())
+    map.visit_cell(player.getRow(), player.getCol())
+    return map.get_cell(player.getRow(), player.getCol())
 
 #==============================================================================
 #encounters
@@ -158,7 +172,6 @@ def game_loop(map, player):
     gameLoopRuns = True
     while gameLoopRuns:
         cell = move_player(map, player)
-
         if cell.encounter != None:
             print("I have an encounter too!")
         
@@ -179,7 +192,7 @@ def main():
     musicPlayer = threading.Thread(target=musicEngine.musicPlayer, daemon=True)
     musicPlayer.start()
 
-    move_player(map, player)
+    game_loop(map, player)
 
     musicEngine.musicSilence()
     musicEngine.complete()
